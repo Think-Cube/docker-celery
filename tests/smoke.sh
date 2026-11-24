@@ -27,4 +27,6 @@ if [ "$result" != "5" ]; then
   echo "expected 5, got: $result"
   exit 1
 fi
-docker logs "$net-worker" 2>&1 | grep -q 'celery@.* ready'
+# Capture first: piping into grep -q can end docker logs with SIGPIPE, which pipefail reports as a failure.
+worker_logs=$(docker logs "$net-worker" 2>&1)
+grep -q 'celery@.* ready' <<< "$worker_logs"
